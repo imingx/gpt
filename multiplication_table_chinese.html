@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国风九九乘法表</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            min-height: 100vh;
+            background: #1a0505;
+            color: #ff4444;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 中国风背景 */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.2;
+        }
+
+        /* 红纸纹理效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 68, 68, 0.01) 2px,
+                    rgba(255, 68, 68, 0.01) 4px
+                );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* 祥云动画 */
+        .cloud-decoration {
+            position: fixed;
+            font-size: 60px;
+            opacity: 0.1;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .cloud-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .cloud-2 { top: 20%; right: 10%; animation-delay: -5s; }
+        .cloud-3 { bottom: 30%; left: 8%; animation-delay: -10s; }
+        .cloud-4 { bottom: 15%; right: 5%; animation-delay: -15s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 中式卷轴样式 */
+        .scroll-container {
+            background: linear-gradient(180deg,
+                rgba(139, 0, 0, 0.3) 0%,
+                rgba(30, 5, 5, 0.95) 5%,
+                rgba(30, 5, 5, 0.95) 95%,
+                rgba(139, 0, 0, 0.3) 100%
+            );
+            border: 4px solid #8b0000;
+            border-radius: 10px;
+            box-shadow:
+                0 0 30px rgba(255, 68, 68, 0.3),
+                inset 0 0 60px rgba(139, 0, 0, 0.2);
+            padding: 40px 30px;
+            position: relative;
+        }
+
+        /* 卷轴顶部装饰 */
+        .scroll-container::before,
+        .scroll-container::after {
+            content: '◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #cc3333;
+            font-size: 16px;
+            letter-spacing: 10px;
+            text-shadow: 0 0 10px #ff4444;
+        }
+
+        .scroll-container::before {
+            top: 12px;
+        }
+
+        .scroll-container::after {
+            bottom: 12px;
+        }
+
+        /* 中国结装饰 */
+        .chinese-knot {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 15px;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 20px #ff4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #ff4444;
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow:
+                0 0 10px #ff4444,
+                0 0 20px #cc3333,
+                0 0 30px #8b0000,
+                2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 8px;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow:
+                0 0 10px #ff4444,
+                0 0 20px #cc3333,
+                0 0 30px #8b0000,
+                2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            50% { text-shadow:
+                0 0 20px #ff4444,
+                0 0 30px #cc3333,
+                0 0 40px #8b0000,
+                2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #cc6666;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 400;
+            letter-spacing: 3px;
+        }
+
+        .tagline {
+            text-align: center;
+            color: #994444;
+            font-size: 12px;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        /* 表格容器 */
+        .table-wrapper {
+            background: rgba(20, 5, 5, 0.6);
+            border: 2px solid #8b0000;
+            border-radius: 8px;
+            padding: 25px;
+            overflow-x: auto;
+            box-shadow:
+                inset 0 0 30px rgba(139, 0, 0, 0.3),
+                0 0 20px rgba(255, 68, 68, 0.2);
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        td {
+            padding: 14px 10px;
+            text-align: center;
+            border: 1px solid #8b000060;
+            color: #ff6666;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 400;
+        }
+
+        td::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                transparent,
+                rgba(255, 68, 68, 0.15),
+                transparent
+            );
+            transform: translateX(-100%) translateY(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        td:hover {
+            background: rgba(255, 68, 68, 0.15);
+            box-shadow:
+                inset 0 0 20px rgba(255, 68, 68, 0.4),
+                0 0 15px rgba(255, 68, 68, 0.3);
+            font-weight: 700;
+            text-shadow: 0 0 10px #ff4444;
+            transform: scale(1.08);
+            color: #ff8888;
+        }
+
+        td:hover::before {
+            transform: translateX(100%) translateY(100%);
+        }
+
+        /* 表头样式 */
+        .header-cell {
+            background: linear-gradient(180deg, #8b0000 0%, #660000 100%);
+            font-weight: 900;
+            font-size: 18px;
+            text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+            border: 2px solid #ff4444;
+            color: #ffcccc;
+        }
+
+        .row-header {
+            background: linear-gradient(90deg, #8b0000 0%, #660000 100%);
+            font-weight: 900;
+            font-size: 18px;
+            text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+            border: 2px solid #ff4444;
+            color: #ffcccc;
+        }
+
+        /* 渐进式出现动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-row {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        /* 底部装饰 */
+        .footer-decoration {
+            text-align: center;
+            margin-top: 25px;
+            color: #994444;
+            font-size: 12px;
+        }
+
+        .lantern {
+            display: inline-block;
+            font-size: 20px;
+            margin: 0 10px;
+            animation: sway 3s ease-in-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        /* 烟花效果容器 */
+        #fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="fireworks"></canvas>
+
+    <div class="cloud-decoration cloud-1">☁</div>
+    <div class="cloud-decoration cloud-2">☁</div>
+    <div class="cloud-decoration cloud-3">☁</div>
+    <div class="cloud-decoration cloud-4">☁</div>
+
+    <div class="container">
+        <div class="scroll-container">
+            <div class="chinese-knot">❀ 中国结 ❀</div>
+
+            <h1>九九乘法表</h1>
+            <p class="subtitle">中华传统文化瑰宝</p>
+            <p class="tagline">—— 传承千年智慧 · 弘扬国粹精华 ——</p>
+
+            <div class="table-wrapper">
+                <table id="multiplicationTable"></table>
+            </div>
+
+            <div class="footer-decoration">
+                <span class="lantern">🏮</span>
+                学而时习之 · 不亦说乎
+                <span class="lantern">🏮</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 祥云飘动背景
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+
+        class Cloud {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.size = Math.random() * 30 + 20;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.3 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < -50 || this.x > bgCanvas.width + 50 ||
+                    this.y < -50 || this.y > bgCanvas.height + 50) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                bgCtx.fillStyle = `rgba(255, 68, 68, ${this.opacity})`;
+                bgCtx.fill();
+            }
+        }
+
+        const clouds = [];
+        for (let i = 0; i < 30; i++) {
+            clouds.push(new Cloud());
+        }
+
+        function animateBackground() {
+            bgCtx.fillStyle = 'rgba(26, 5, 5, 0.1)';
+            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            clouds.forEach(cloud => {
+                cloud.update();
+                cloud.draw();
+            });
+
+            requestAnimationFrame(animateBackground);
+        }
+
+        animateBackground();
+
+        // 烟花效果
+        const fwCanvas = document.getElementById('fireworks');
+        const fwCtx = fwCanvas.getContext('2d');
+
+        fwCanvas.width = window.innerWidth;
+        fwCanvas.height = window.innerHeight;
+
+        class Firework {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.particles = [];
+                this.exploded = false;
+
+                for (let i = 0; i < 50; i++) {
+                    const angle = (Math.PI * 2 / 50) * i;
+                    const speed = Math.random() * 3 + 2;
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1,
+                        decay: Math.random() * 0.02 + 0.01
+                    });
+                }
+            }
+
+            update() {
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.05;
+                    p.life -= p.decay;
+                });
+            }
+
+            draw() {
+                this.particles.forEach(p => {
+                    if (p.life > 0) {
+                        fwCtx.beginPath();
+                        fwCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+                        fwCtx.fillStyle = `rgba(255, 68, 68, ${p.life})`;
+                        fwCtx.fill();
+                    }
+                });
+            }
+
+            isDead() {
+                return this.particles.every(p => p.life <= 0);
+            }
+        }
+
+        const fireworks = [];
+
+        function createFirework(x, y) {
+            fireworks.push(new Firework(x, y));
+        }
+
+        function animateFireworks() {
+            fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].update();
+                fireworks[i].draw();
+
+                if (fireworks[i].isDead()) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateFireworks);
+        }
+
+        animateFireworks();
+
+        // 随机触发烟花
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createFirework(
+                    Math.random() * fwCanvas.width,
+                    Math.random() * fwCanvas.height * 0.6
+                );
+            }
+        }, 2000);
+
+        // 动态生成九九乘法表
+        function createMultiplicationTable() {
+            const table = document.getElementById('multiplicationTable');
+
+            // 创建表头
+            const headerRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.className = 'header-cell';
+            headerRow.appendChild(emptyCell);
+
+            for (let i = 1; i <= 9; i++) {
+                const th = document.createElement('td');
+                th.className = 'header-cell';
+                th.textContent = i;
+                headerRow.appendChild(th);
+            }
+            table.appendChild(headerRow);
+
+            // 创建表格内容（带动画）
+            for (let i = 1; i <= 9; i++) {
+                setTimeout(() => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row';
+                    row.style.animationDelay = (i * 0.1) + 's';
+
+                    // 行标题
+                    const rowHeader = document.createElement('td');
+                    rowHeader.className = 'row-header';
+                    rowHeader.textContent = i;
+                    row.appendChild(rowHeader);
+
+                    for (let j = 1; j <= 9; j++) {
+                        const cell = document.createElement('td');
+                        cell.textContent = `${i}×${j}=${i*j}`;
+
+                        // 添加点击触发烟花效果
+                        cell.addEventListener('click', (e) => {
+                            const rect = cell.getBoundingClientRect();
+                            createFirework(rect.left + rect.width / 2, rect.top);
+                        });
+
+                        row.appendChild(cell);
+                    }
+                    table.appendChild(row);
+                }, i * 100);
+            }
+        }
+
+        // 窗口大小改变时重新设置画布大小
+        window.addEventListener('resize', () => {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+
+            fwCanvas.width = window.innerWidth;
+            fwCanvas.height = window.innerHeight;
+        });
+
+        // 页面加载时生成表格
+        createMultiplicationTable();
+
+        // 页面加载时的庆祝烟花
+        setTimeout(() => {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFirework(
+                        Math.random() * window.innerWidth,
+                        Math.random() * window.innerHeight * 0.5
+                    );
+                }, i * 300);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
